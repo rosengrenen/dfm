@@ -12,10 +12,10 @@ async fn main() -> std::io::Result<()> {
 async fn symlink_folder(src_dir: &str, target_dir: &str) {
     fs::create_dir_all(target_dir)
         .await
-        .expect(&format!("Could not create {}", target_dir));
+        .unwrap_or_else(|_| panic!("Could not create {}", target_dir));
     let mut dir_contents = fs::read_dir(src_dir)
         .await
-        .expect(&format!("Could read dir {}", src_dir));
+        .unwrap_or_else(|_| panic!("Could read dir {}", src_dir));
     while let Ok(Some(entry)) = dir_contents.next_entry().await {
         let os_name = entry.file_name();
         let name = os_name.to_str().unwrap();

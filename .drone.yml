@@ -1,0 +1,30 @@
+---
+kind: pipeline
+type: docker
+name: CI
+steps:
+  - name: cargo check
+    image: rust
+    commands:
+      - cargo check
+
+  - name: cargo test
+    image: rust
+    commands:
+      - cargo test
+
+  - name: cargo format
+    image: rust
+    commands:
+      - cargo fmt --all -- --check
+
+  - name: cargo clippy
+    image: rust
+    commands:
+      - cargo clippy -- -D warnings
+
+---
+kind: signature
+hmac: 2995d0a2364ec46c8b1497477a38a154fb5ba7e2edd1b76aa7fa9d4dc46e4546
+
+...

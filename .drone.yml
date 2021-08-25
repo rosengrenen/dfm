@@ -16,6 +16,7 @@ steps:
   - name: cargo format
     image: rust
     commands:
+      - rustup component add rustfmt
       - cargo fmt --all -- --check
 
   - name: cargo clippy
@@ -25,6 +26,6 @@ steps:
 
 ---
 kind: signature
-hmac: 2995d0a2364ec46c8b1497477a38a154fb5ba7e2edd1b76aa7fa9d4dc46e4546
+hmac: 5679be2f0894641063c405b0f70f1cceba5332c40b13ef0c43852a97b06eaf92
 
 ...

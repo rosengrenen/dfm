@@ -22,10 +22,11 @@ steps:
   - name: cargo clippy
     image: rust
     commands:
+      - rustup component add clippy
       - cargo clippy -- -D warnings
 
 ---
 kind: signature
-hmac: 5679be2f0894641063c405b0f70f1cceba5332c40b13ef0c43852a97b06eaf92
+hmac: 3af9f2acdbf7653904324aaffe4dc6cbef09e5478b15247c700fdd04b9711d0f
 
 ...

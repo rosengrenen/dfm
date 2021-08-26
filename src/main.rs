@@ -9,7 +9,7 @@ use build::build_tree;
 use check::check_tree;
 use link::link_tree;
 
-const APP_VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

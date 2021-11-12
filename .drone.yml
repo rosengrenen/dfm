@@ -7,28 +7,32 @@ steps:
     image: rust
     commands:
       - cargo check
-    depends_on: []
+    depends_on:
+      - clone
 
   - name: cargo test
     image: rust
     commands:
       - cargo test
-    depends_on: []
+    depends_on:
+      - clone
 
   - name: cargo format
     image: rust
     commands:
       - rustup component add rustfmt
       - cargo fmt --all -- --check
-    depends_on: []
+    depends_on:
+      - clone
 
   - name: cargo clippy
     image: rust
     commands:
       - rustup component add clippy
       - cargo clippy -- -D warnings
-    depends_on: []
+    depends_on:
+      - clone
 
 ---
 kind: signature
-hmac: b2c8a44c97d5ab83c0ae456026b049475462a11e36a4158a16aa26c3de07674e
+hmac: 72c9d6b9c30c5bba944fadcee41b4a3d0c634bd15e4da564d776a0a74dc7c574

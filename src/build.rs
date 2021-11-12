@@ -3,7 +3,7 @@ use crate::{
 	utils::{get_tree_files, remove_dir_if_empty},
 };
 
-pub async fn build(config: &Config) -> std::io::Result<()> {
+pub async fn build(config: &Config) -> anyhow::Result<()> {
 	let source_files = get_tree_files(config, &config.source_dir).await?;
 	let build_files = get_tree_files(config, &config.build_dir).await?;
 

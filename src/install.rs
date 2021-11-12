@@ -3,7 +3,7 @@ use crate::{
 	utils::{get_tree_files, remove_dir_if_empty},
 };
 
-pub async fn install(config: &Config) -> std::io::Result<()> {
+pub async fn install(config: &Config) -> anyhow::Result<()> {
 	let built_files = get_tree_files(config, &config.build_dir).await?;
 	let installed_files = get_tree_files(config, &config.install_dir).await?;
 
@@ -13,8 +13,8 @@ pub async fn install(config: &Config) -> std::io::Result<()> {
 			tokio::fs::create_dir_all(dir).await?;
 		}
 
-		let from = config.source_dir.join(file_path);
-		let to = config.build_dir.join(file_path);
+		let from = config.build_dir.join(file_path);
+		let to = config.install_dir.join(file_path);
 		tokio::fs::copy(from, to).await?;
 
 		if let Some(folder_path) = file_path.parent() {
@@ -22,11 +22,14 @@ pub async fn install(config: &Config) -> std::io::Result<()> {
 			tokio::fs::create_dir_all(dir).await?;
 		}
 
-		tokio::fs::symlink(
-			config.install_dir.join(&file_path),
-			config.link_dir.join(&file_path),
-		)
-		.await?;
+		// Make sure symlink doesn't exist before attempting to symlink
+		let link_target = config.link_dir.join(&file_path);
+		match tokio::fs::remove_file(&link_target).await {
+			Ok(_) => {}
+			Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+			Err(e) => anyhow::bail!(e),
+		};
+		tokio::fs::symlink(config.install_dir.join(&file_path), link_target).await?;
 	}
 
 	for file_path in installed_files {

@@ -4,7 +4,7 @@ use terminal_size::{terminal_size, Width};
 
 use crate::{config::Config, utils::get_tree_files};
 
-pub async fn diff(config: &Config, diff_command: String) -> std::io::Result<()> {
+pub async fn diff(config: &Config, diff_command: String) -> anyhow::Result<()> {
 	let built_files = get_tree_files(config, &config.build_dir).await?;
 	let installed_files = get_tree_files(config, &config.install_dir).await?;
 

@@ -10,10 +10,7 @@ use crate::config::Config;
 
 pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub async fn get_tree_files(
-	config: &Config,
-	tree_root: &Path,
-) -> std::io::Result<HashSet<PathBuf>> {
+pub async fn get_tree_files(config: &Config, tree_root: &Path) -> anyhow::Result<HashSet<PathBuf>> {
 	get_tree_files_recursively(config, tree_root, PathBuf::new()).await
 }
 
@@ -22,7 +19,7 @@ async fn get_tree_files_recursively(
 	config: &Config,
 	tree_root: &Path,
 	relative_path: PathBuf,
-) -> std::io::Result<HashSet<PathBuf>> {
+) -> anyhow::Result<HashSet<PathBuf>> {
 	let current_path = tree_root.join(&relative_path);
 
 	let mut dir_walker = read_dir(&current_path).await?;
@@ -57,7 +54,7 @@ async fn get_tree_files_recursively(
 	Ok(files)
 }
 
-pub async fn remove_dir_if_empty(path: &Path) -> std::io::Result<()> {
+pub async fn remove_dir_if_empty(path: &Path) -> anyhow::Result<()> {
 	let mut dir_walker = tokio::fs::read_dir(path).await?;
 
 	if dir_walker.next_entry().await?.is_none() {

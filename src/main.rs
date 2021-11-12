@@ -7,7 +7,8 @@ mod utils;
 
 use std::path::PathBuf;
 
-use clap::Parser;
+use clap::{IntoApp, Parser};
+use clap_generate::generate;
 use directories::{ProjectDirs, UserDirs};
 
 use crate::{
@@ -16,8 +17,18 @@ use crate::{
 };
 
 #[tokio::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> anyhow::Result<()> {
 	let opts = Opts::parse();
+
+	if let Some(generator) = opts.generate {
+		generate(
+			generator,
+			&mut Opts::into_app(),
+			"dfm",
+			&mut std::io::stdout(),
+		);
+		return Ok(());
+	}
 
 	let user_dirs = UserDirs::new().expect("Could not find user directories");
 	let project_dirs =

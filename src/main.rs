@@ -11,10 +11,7 @@ use clap::{IntoApp, Parser};
 use clap_generate::generate;
 use directories::{ProjectDirs, UserDirs};
 
-use crate::{
-	build::build, config::Config, diff::diff, install::install, opts::Opts,
-	utils::remove_dir_if_empty,
-};
+use crate::{build::build, config::Config, diff::diff, install::install, opts::Opts};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -50,7 +47,6 @@ async fn main() -> anyhow::Result<()> {
 		ignored_dirs: vec![".git".to_string()],
 	};
 
-	remove_dir_if_empty(&PathBuf::from("/home/rosen/test")).await?;
 	build(&config).await?;
 	if opts.install {
 		install(&config).await?;

@@ -4,12 +4,13 @@ use crate::{
 };
 
 pub async fn install(config: &Config) -> anyhow::Result<()> {
+	tokio::fs::create_dir_all(&config.install_dir).await?;
 	let built_files = get_tree_files(config, &config.build_dir).await?;
 	let installed_files = get_tree_files(config, &config.install_dir).await?;
 
 	for file_path in built_files.iter() {
 		if let Some(folder_path) = file_path.parent() {
-			let dir = config.build_dir.join(folder_path);
+			let dir = config.install_dir.join(folder_path);
 			tokio::fs::create_dir_all(dir).await?;
 		}
 

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use clap::Parser;
-use clap_generate::Shell;
+use clap_complete::Shell;
 
 use crate::utils::APP_VERSION;
 
@@ -20,7 +20,7 @@ pub struct Opts {
 		short,
 		long,
 		default_value = ".df",
-		about = "Absolute path or relative path to $HOME"
+		help = "Absolute path or relative path to $HOME"
 	)]
 	pub repo_path: PathBuf,
 
@@ -28,10 +28,10 @@ pub struct Opts {
 		short,
 		long,
 		default_value = "delta",
-		about = "Command to execute to show diffs"
+		help = "Command to execute to show diffs"
 	)]
 	pub diff_command: String,
 
-	#[clap(long, value_name = "SHELL", about = "Generate shell completions")]
+	#[clap(long, value_name = "SHELL", help = "Generate shell completions")]
 	pub generate: Option<Shell>,
 }

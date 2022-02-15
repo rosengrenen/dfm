@@ -4,6 +4,7 @@ use crate::{
 };
 
 pub async fn build(config: &Config) -> anyhow::Result<()> {
+	tokio::fs::create_dir_all(&config.build_dir).await?;
 	let source_files = get_tree_files(config, &config.source_dir).await?;
 	let build_files = get_tree_files(config, &config.build_dir).await?;
 

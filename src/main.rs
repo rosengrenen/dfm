@@ -8,7 +8,7 @@ mod utils;
 use std::path::PathBuf;
 
 use clap::{IntoApp, Parser};
-use clap_generate::generate;
+use clap_complete::generate;
 use directories::{ProjectDirs, UserDirs};
 
 use crate::{build::build, config::Config, diff::diff, install::install, opts::Opts};

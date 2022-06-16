@@ -24,14 +24,6 @@ pub struct Opts {
 	)]
 	pub repo_path: PathBuf,
 
-	#[clap(
-		short,
-		long,
-		default_value = "delta",
-		help = "Command to execute to show diffs"
-	)]
-	pub diff_command: String,
-
 	#[clap(long, value_name = "SHELL", help = "Generate shell completions")]
 	pub generate: Option<Shell>,
 }

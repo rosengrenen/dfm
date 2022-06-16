@@ -10,6 +10,7 @@ use std::path::PathBuf;
 use clap::{IntoApp, Parser};
 use clap_complete::generate;
 use directories::{ProjectDirs, UserDirs};
+use utils::command_exists;
 
 use crate::{build::build, config::Config, diff::diff, install::install, opts::Opts};
 
@@ -51,7 +52,12 @@ async fn main() -> anyhow::Result<()> {
 	if opts.install {
 		install(&config).await?;
 	} else {
-		diff(&config, opts.diff_command).await?;
+		if !command_exists("delta").await {
+			println!("'delta' is not installed");
+			return Ok(());
+		}
+		
+		diff(&config).await?;
 	}
 
 	Ok(())

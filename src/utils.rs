@@ -63,3 +63,8 @@ pub async fn remove_dir_if_empty(path: &Path) -> anyhow::Result<()> {
 
 	Ok(())
 }
+
+pub async fn command_exists(command: &str) -> bool {
+	tokio::process::Command::new("which")
+			.arg(&command).status().await.is_ok()
+}

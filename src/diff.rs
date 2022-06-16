@@ -4,7 +4,7 @@ use terminal_size::{terminal_size, Width};
 
 use crate::{config::Config, utils::get_tree_files};
 
-pub async fn diff(config: &Config, diff_command: String) -> anyhow::Result<()> {
+pub async fn diff(config: &Config) -> anyhow::Result<()> {
 	tokio::fs::create_dir_all(&config.install_dir).await?;
 	let built_files = get_tree_files(config, &config.build_dir).await?;
 	let installed_files = get_tree_files(config, &config.install_dir).await?;
@@ -39,7 +39,7 @@ pub async fn diff(config: &Config, diff_command: String) -> anyhow::Result<()> {
 			)
 		};
 
-		let output = tokio::process::Command::new(&diff_command)
+		let output = tokio::process::Command::new("delta")
 			.current_dir(workdir)
 			.arg(second_path)
 			.arg(first_path)

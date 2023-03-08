@@ -62,6 +62,8 @@ pub fn remove_dir_if_empty(path: &Path) -> anyhow::Result<()> {
 pub fn command_exists(command: &str) -> bool {
 	std::process::Command::new("which")
 		.arg(&command)
+		.stdout(std::process::Stdio::null())
+		.stderr(std::process::Stdio::null())
 		.status()
 		.is_ok()
 }

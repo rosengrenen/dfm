@@ -27,7 +27,9 @@ pub enum Commands {
 		)]
 		repo_path: PathBuf,
 
-		#[clap(help = "Filter which files should be installed, checks for substring")]
+		#[clap(
+			help = "Filter which files should be installed, checks if if path starts with this"
+		)]
 		filter: Option<String>,
 
 		#[clap(short, long, default_value = "true", help = "Symlink the built files")]
@@ -42,6 +44,9 @@ pub enum Commands {
 			help = "Path to source repo, absolute path or path relative to $HOME"
 		)]
 		repo_path: PathBuf,
+
+		#[clap(help = "Filter which files should be diffed, checks if if path starts with this")]
+		filter: Option<String>,
 	},
 	#[clap(about = "Generate shell completions")]
 	GenerateCompletions {

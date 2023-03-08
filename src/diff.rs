@@ -4,10 +4,21 @@ use terminal_size::{terminal_size, Width};
 
 use crate::{context::Context, utils::get_tree_files};
 
-pub fn diff(context: &Context) -> anyhow::Result<()> {
+pub fn diff(context: &Context, filter: &Option<String>) -> anyhow::Result<()> {
 	std::fs::create_dir_all(&context.install_dir)?;
-	let built_files = get_tree_files(context, &context.build_dir)?;
-	let installed_files = get_tree_files(context, &context.install_dir)?;
+	let mut built_files = get_tree_files(context, &context.build_dir)?;
+	let mut installed_files = get_tree_files(context, &context.install_dir)?;
+	if let Some(filter) = filter {
+		log::debug!("Using filter: {}", filter);
+		built_files = built_files
+			.into_iter()
+			.filter(|path| path.starts_with(filter))
+			.collect();
+		installed_files = installed_files
+			.into_iter()
+			.filter(|path| path.starts_with(filter))
+			.collect();
+	}
 	log::debug!("Built files: {:#?}", built_files);
 	log::debug!("Installed files: {:#?}", installed_files);
 

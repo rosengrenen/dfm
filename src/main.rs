@@ -35,11 +35,11 @@ fn main() -> anyhow::Result<()> {
 				apply(&context, &filter, link).expect("Failed to apply");
 			}
 		}
-		opts::Commands::Diff { repo_path } => {
+		opts::Commands::Diff { repo_path, filter } => {
 			let context = build_context(repo_path);
 			log::debug!("Context: {:#?}", context);
 			build(&context).expect("Failed to build");
-			diff(&context).expect("Failed to diff");
+			diff(&context, &filter).expect("Failed to diff");
 		}
 		opts::Commands::GenerateCompletions { shell } => {
 			generate(shell, &mut Opts::command(), "dfm", &mut std::io::stdout());

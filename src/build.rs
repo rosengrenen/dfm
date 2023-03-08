@@ -1,29 +1,34 @@
 use crate::{
-	config::Config,
+	context::Context,
 	utils::{get_tree_files, remove_dir_if_empty},
 };
 
-pub async fn build(config: &Config) -> anyhow::Result<()> {
-	tokio::fs::create_dir_all(&config.build_dir).await?;
-	let source_files = get_tree_files(config, &config.source_dir).await?;
-	let build_files = get_tree_files(config, &config.build_dir).await?;
+pub fn build(context: &Context) -> anyhow::Result<()> {
+	std::fs::create_dir_all(&context.build_dir)?;
+	let source_files = get_tree_files(context, &context.source_dir)?;
+	let build_files = get_tree_files(context, &context.build_dir)?;
+	log::debug!("Source files: {:#?}", source_files);
+	log::debug!("Existing files: {:#?}", build_files);
 
 	for file_path in source_files.iter() {
+		// Make sure that the folder into which the file is to be created exists
 		if let Some(folder_path) = file_path.parent() {
-			let dir = config.build_dir.join(folder_path);
-			tokio::fs::create_dir_all(dir).await?;
+			let dir = context.build_dir.join(folder_path);
+			std::fs::create_dir_all(dir)?;
 		}
 
-		let from = config.source_dir.join(file_path);
-		let to = config.build_dir.join(file_path);
-		tokio::fs::copy(from, to).await?;
+		let from = context.source_dir.join(file_path);
+		let to = context.build_dir.join(file_path);
+		log::debug!("Copied {:?} to {:?}", from, to);
+		std::fs::copy(from, to)?;
 	}
 
 	for file_path in build_files {
 		if !source_files.contains(&file_path) {
-			let file = config.build_dir.join(file_path);
-			tokio::fs::remove_file(file.clone()).await?;
-			remove_dir_if_empty(file.parent().unwrap()).await?;
+			let file = context.build_dir.join(file_path);
+			log::debug!("Removed {:?}", file);
+			std::fs::remove_file(file.clone())?;
+			remove_dir_if_empty(file.parent().unwrap())?;
 		}
 	}
 

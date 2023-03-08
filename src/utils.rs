@@ -3,68 +3,65 @@ use std::{
 	path::{Path, PathBuf},
 };
 
-use futures::future::try_join_all;
-use tokio::fs::read_dir;
+use crate::context::Context;
 
-use crate::config::Config;
-
-pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
-
-pub async fn get_tree_files(config: &Config, tree_root: &Path) -> anyhow::Result<HashSet<PathBuf>> {
-	get_tree_files_recursively(config, tree_root, PathBuf::new()).await
+pub fn get_tree_files(context: &Context, tree_root: &Path) -> anyhow::Result<HashSet<PathBuf>> {
+	get_tree_files_recursively(context, tree_root, PathBuf::new())
 }
 
-#[async_recursion::async_recursion]
-async fn get_tree_files_recursively(
-	config: &Config,
+fn get_tree_files_recursively(
+	context: &Context,
 	tree_root: &Path,
 	relative_path: PathBuf,
 ) -> anyhow::Result<HashSet<PathBuf>> {
 	let current_path = tree_root.join(&relative_path);
-
-	let mut dir_walker = read_dir(&current_path).await?;
-	let mut dir_tasks = vec![];
-
+	let mut dir_walker = std::fs::read_dir(&current_path)?;
 	let mut files = HashSet::new();
 
-	while let Some(entry) = dir_walker.next_entry().await? {
-		let metadata = entry.metadata().await?;
+	while let Some(Ok(entry)) = dir_walker.next() {
+		let metadata = entry.metadata()?;
 		let os_name = entry.file_name();
 		let name = os_name.to_string_lossy().to_string();
-		if config.ignored_dirs.contains(&name) {
+		if context.ignored_dirs.contains(&name) {
 			continue;
 		}
 
 		if metadata.is_dir() {
-			dir_tasks.push(get_tree_files_recursively(
-				config,
+			files.extend(get_tree_files_recursively(
+				context,
 				tree_root,
 				relative_path.join(name),
-			));
+			)?);
 		} else if metadata.is_file() {
 			files.insert(relative_path.join(name));
 		}
 	}
 
-	let file_sets = try_join_all(dir_tasks).await?;
-	for file_set in file_sets {
-		files.extend(file_set);
-	}
-
 	Ok(files)
 }
 
-pub async fn remove_dir_if_empty(path: &Path) -> anyhow::Result<()> {
-	let mut dir_walker = tokio::fs::read_dir(path).await?;
+pub fn remove_dir_if_empty(path: &Path) -> anyhow::Result<()> {
+	let mut path = path.to_path_buf();
 
-	if dir_walker.next_entry().await?.is_none() {
-		tokio::fs::remove_dir(path).await?;
+	loop {
+		let mut dir_walker = std::fs::read_dir(&path)?;
+		if dir_walker.next().is_none() {
+			std::fs::remove_dir(&path)?;
+			match path.parent() {
+				Some(parent) => path = parent.to_path_buf(),
+				None => break,
+			}
+		} else {
+			break;
+		}
 	}
 
 	Ok(())
 }
 
-pub async fn command_exists(command: &str) -> bool {
-	tokio::process::Command::new("which")
-			.arg(&command).status().await.is_ok()
+pub fn command_exists(command: &str) -> bool {
+	std::process::Command::new("which")
+		.arg(&command)
+		.status()
+		.is_ok()
 }

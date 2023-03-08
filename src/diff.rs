@@ -2,12 +2,14 @@ use std::{io::Write, path::PathBuf};
 
 use terminal_size::{terminal_size, Width};
 
-use crate::{config::Config, utils::get_tree_files};
+use crate::{context::Context, utils::get_tree_files};
 
-pub async fn diff(config: &Config) -> anyhow::Result<()> {
-	tokio::fs::create_dir_all(&config.install_dir).await?;
-	let built_files = get_tree_files(config, &config.build_dir).await?;
-	let installed_files = get_tree_files(config, &config.install_dir).await?;
+pub fn diff(context: &Context) -> anyhow::Result<()> {
+	std::fs::create_dir_all(&context.install_dir)?;
+	let built_files = get_tree_files(context, &context.build_dir)?;
+	let installed_files = get_tree_files(context, &context.install_dir)?;
+	log::debug!("Built files: {:#?}", built_files);
+	log::debug!("Installed files: {:#?}", installed_files);
 
 	let mut all_files = built_files.clone();
 	all_files.extend(installed_files.clone());
@@ -21,32 +23,34 @@ pub async fn diff(config: &Config) -> anyhow::Result<()> {
 
 		let (workdir, first_path, second_path) = if is_added {
 			(
-				config.build_dir.clone(),
+				context.build_dir.clone(),
 				file.clone(),
 				PathBuf::from("/dev/null"),
 			)
 		} else if is_removed {
 			(
-				config.install_dir.clone(),
+				context.install_dir.clone(),
 				PathBuf::from("/dev/null"),
 				file.clone(),
 			)
 		} else {
 			(
-				config.build_dir.clone(),
+				context.build_dir.clone(),
 				file.clone(),
-				config.install_dir.join(file),
+				context.install_dir.join(file),
 			)
 		};
 
-		let output = tokio::process::Command::new("delta")
+		let output = std::process::Command::new("difft")
 			.current_dir(workdir)
 			.arg(second_path)
 			.arg(first_path)
-			.arg("-w")
+			.arg("--skip-unchanged")
+			.arg("--color")
+			.arg("always")
+			.arg("--width")
 			.arg(terminal_width.to_string())
-			.output()
-			.await?;
+			.output()?;
 		std::io::stdout().write_all(&output.stdout)?;
 	}
 

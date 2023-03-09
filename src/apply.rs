@@ -62,10 +62,15 @@ pub fn apply(context: &Context, filter: &Option<String>, link: bool) -> anyhow::
 		if !built_files.contains(&file_path) {
 			let installed_file = context.install_dir.join(&file_path);
 			let linked_file = context.link_dir.join(&file_path);
-			std::fs::remove_file(linked_file.clone())?;
-			remove_dir_if_empty(linked_file.parent().unwrap())?;
-			std::fs::remove_file(installed_file.clone())?;
-			remove_dir_if_empty(installed_file.parent().unwrap())?;
+			if linked_file.exists() {
+				std::fs::remove_file(linked_file.clone())?;
+				remove_dir_if_empty(linked_file.parent().unwrap())?;
+			}
+
+			if installed_file.exists() {
+				std::fs::remove_file(installed_file.clone())?;
+				remove_dir_if_empty(installed_file.parent().unwrap())?;
+			}
 		}
 	}
 

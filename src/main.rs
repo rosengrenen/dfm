@@ -1,5 +1,6 @@
 mod apply;
 mod build;
+mod cleanup;
 mod context;
 mod diff;
 mod opts;
@@ -12,7 +13,8 @@ use clap_complete::generate;
 use directories::{ProjectDirs, UserDirs};
 
 use crate::{
-	apply::apply, build::build, context::Context, diff::diff, opts::Opts, utils::command_exists,
+	apply::apply, build::build, cleanup::cleanup, context::Context, diff::diff, opts::Opts,
+	utils::command_exists,
 };
 
 fn main() -> anyhow::Result<()> {
@@ -40,6 +42,11 @@ fn main() -> anyhow::Result<()> {
 			log::debug!("Context: {:#?}", context);
 			build(&context).expect("Failed to build");
 			diff(&context, &filter).expect("Failed to diff");
+		}
+		opts::Commands::Cleanup => {
+			let context = build_context(PathBuf::new());
+			log::debug!("Context: {:#?}", context);
+			cleanup(&context).expect("Failed to cleanup");
 		}
 		opts::Commands::GenerateCompletions { shell } => {
 			generate(shell, &mut Opts::command(), "dfm", &mut std::io::stdout());

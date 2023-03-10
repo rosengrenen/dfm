@@ -15,9 +15,15 @@ fn get_tree_files_recursively(
 	relative_path: PathBuf,
 ) -> anyhow::Result<HashSet<PathBuf>> {
 	let current_path = tree_root.join(&relative_path);
-	let mut dir_walker = std::fs::read_dir(&current_path)?;
-	let mut files = HashSet::new();
+	let mut dir_walker = match std::fs::read_dir(&current_path) {
+		Ok(dir_walker) => dir_walker,
+		Err(error) => match error.kind() {
+			std::io::ErrorKind::PermissionDenied => return Ok(HashSet::new()),
+			_ => anyhow::bail!(error),
+		},
+	};
 
+	let mut files = HashSet::new();
 	while let Some(Ok(entry)) = dir_walker.next() {
 		let metadata = entry.metadata()?;
 		let os_name = entry.file_name();

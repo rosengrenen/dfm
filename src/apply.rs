@@ -20,6 +20,7 @@ pub fn apply(context: &Context, filter: &Option<String>, link: bool) -> anyhow::
 			.filter(|path| path.starts_with(filter))
 			.collect();
 	}
+
 	log::debug!("Built files: {:#?}", built_files);
 	log::debug!("Installed files: {:#?}", installed_files);
 

@@ -48,6 +48,8 @@ pub enum Commands {
 		#[clap(help = "Filter which files should be diffed, checks if if path starts with this")]
 		filter: Option<String>,
 	},
+	#[clap(about = "Remove dotfiles")]
+	Cleanup,
 	#[clap(about = "Generate shell completions")]
 	GenerateCompletions {
 		#[clap(long, value_name = "SHELL", help = "Generate shell completions")]

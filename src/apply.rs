@@ -1,3 +1,5 @@
+use colored::Colorize;
+
 use crate::{
 	context::Context,
 	utils::{get_tree_files, remove_dir_if_empty},
@@ -36,10 +38,11 @@ pub fn apply(context: &Context, filter: &Option<String>, link: bool) -> anyhow::
 			let link_target = context.link_dir.join(&file_path);
 			let link_target_exists = link_target.exists();
 			if link_target_exists && !link_target.is_symlink() {
-				log::warn!(
+				let error = format!(
 					"Could not link {:?}, link target already exists and is not a symlink",
 					file_path
 				);
+				println!("{}", error.red());
 			} else {
 				if link_target_exists {
 					match std::fs::remove_file(&link_target) {

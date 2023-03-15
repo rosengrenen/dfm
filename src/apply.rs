@@ -5,7 +5,12 @@ use crate::{
 	utils::{get_tree_files, remove_dir_if_empty},
 };
 
-pub fn apply(context: &Context, filter: &Option<String>, link: bool) -> anyhow::Result<()> {
+pub fn apply(
+	context: &Context,
+	filter: &Option<String>,
+	link: bool,
+	force_link: bool,
+) -> anyhow::Result<()> {
 	std::fs::create_dir_all(&context.install_dir)?;
 	let mut built_files = get_tree_files(context, &context.build_dir)?;
 	let mut installed_files = get_tree_files(context, &context.install_dir)?;
@@ -38,9 +43,9 @@ pub fn apply(context: &Context, filter: &Option<String>, link: bool) -> anyhow::
 			// Make sure symlink doesn't exist before attempting to symlink
 			let link_target = context.link_dir.join(&file_path);
 			let link_target_exists = link_target.exists();
-			if link_target_exists && !link_target.is_symlink() {
+			if !force_link && link_target_exists && !link_target.is_symlink() {
 				let error = format!(
-					"Could not link {:?}, link target already exists and is not a symlink",
+					"Could not link {:?}, link target already exists and is not a symlink, use --force if you want to override the file",
 					file_path
 				);
 				println!("{}", error.red());

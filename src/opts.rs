@@ -34,6 +34,9 @@ pub enum Commands {
 
 		#[clap(short, long, default_value = "true", help = "Symlink the built files")]
 		link: bool,
+
+		#[clap(short, long, default_value = "false", help = "Override existing files")]
+		force: bool,
 	},
 	#[clap(about = "Display diff between repo and installed files")]
 	Diff {

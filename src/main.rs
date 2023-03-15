@@ -27,6 +27,7 @@ fn main() -> anyhow::Result<()> {
 			repo_path,
 			filter,
 			link,
+			force,
 		} => {
 			if !command_exists("difft") {
 				println!("'difft' is not installed");
@@ -34,7 +35,7 @@ fn main() -> anyhow::Result<()> {
 				let context = build_context(repo_path);
 				log::debug!("Context: {:#?}", context);
 				build(&context).expect("Failed to build");
-				apply(&context, &filter, link).expect("Failed to apply");
+				apply(&context, &filter, link, force).expect("Failed to apply");
 			}
 		}
 		opts::Commands::Diff { repo_path, filter } => {
